@@ -2,9 +2,10 @@
 
 The site is static files at the repo root. [`CNAME`](CNAME) points at `donkeybas.com`.
 
+Deploy uses **GitHub Actions** (see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)), not “Deploy from a branch”. That workflow stamps `version.json` with `GITHUB_SHA` so the footer can show which commit is live. (Branch-based Pages has no build-time env vars.)
+
 1. **GitHub → Settings → Pages**
-   - Source: Deploy from branch
-   - Branch: `main` / `/ (root)`
+   - Source: **GitHub Actions**
    - Custom domain: `donkeybas.com`
    - Enable **Enforce HTTPS** after DNS works
 
