@@ -60,32 +60,38 @@ export function getPixelIndex(imageData, x, y) {
 /**
  * Scale logical 320×200 onto the display.
  * Desktop: integer nearest-neighbor scale.
- * Mobile: fill viewport width (fractional scale OK; CSS keeps pixels crisp).
+ * Mobile / immersive: fill viewport width (fractional scale OK).
  */
-export function fitStage(displayCanvas, stageEl) {
-  const narrow = window.matchMedia("(max-width: 720px)").matches;
-  // Side borders are 2px each; on mobile we drop them for edge-to-edge.
-  const frameX = narrow ? 0 : 4;
-  const padX = narrow ? 0 : 48;
-  // Header, hints, about peek — leave room so the canvas is the hero
-  const padY = narrow
-    ? Math.min(200, Math.max(100, window.innerHeight * 0.22))
-    : Math.min(280, Math.max(160, window.innerHeight * 0.28));
-  const maxW = Math.max(W, window.innerWidth - padX - frameX);
-  const maxH = Math.max(H, window.innerHeight - padY);
-  let scale = Math.min(maxW / W, maxH / H);
-  if (!narrow) {
-    scale = Math.floor(scale);
+export function fitStage(displayCanvas, stageEl, opts = {}) {
+  const immersive = !!opts.immersive || document.body.classList.contains("immersive");
+  const narrow =
+    immersive || window.matchMedia("(max-width: 720px)").matches;
+  const vw = document.documentElement.clientWidth || window.innerWidth;
+  const vh = window.visualViewport?.height ?? window.innerHeight;
+
+  let cssW;
+  let cssH;
+  if (narrow) {
+    // Always full bleed width on phones / fullscreen — never letterbox sideways.
+    cssW = Math.round(vw);
+    cssH = Math.round((cssW * H) / W);
+    if (immersive && cssH > vh) {
+      cssH = Math.round(vh);
+      cssW = Math.round((cssH * W) / H);
+    }
+  } else {
+    const padX = 48 + 4; // page margin + stage border
+    const padY = Math.min(280, Math.max(160, vh * 0.28));
+    let scale = Math.floor(Math.min((vw - padX) / W, (vh - padY) / H));
     if (scale < 1) scale = 1;
-  } else if (scale < 0.5) {
-    scale = 0.5;
+    cssW = W * scale;
+    cssH = H * scale;
   }
-  const cssW = Math.round(W * scale);
-  const cssH = Math.round(H * scale);
+
   displayCanvas.style.width = `${cssW}px`;
   displayCanvas.style.height = `${cssH}px`;
   stageEl.style.width = `${cssW}px`;
-  return scale;
+  return cssW / W;
 }
 
 export function blit(bufferCanvas, displayCtx) {

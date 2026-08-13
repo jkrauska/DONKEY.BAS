@@ -155,6 +155,68 @@ kbd {
   user-select: none;
 }
 
+.ctrl-btn {
+  appearance: none;
+  margin: 0;
+  padding: 0.2em 0.55em;
+  border: 1px solid var(--frame);
+  border-radius: 3px;
+  background: #21262d;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ctrl-btn:active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* Immersive / “fullscreen” — hides chrome; useful on iOS (no element Fullscreen API). */
+body.immersive {
+  overflow: hidden;
+  background: #000;
+}
+
+body.immersive .page {
+  max-width: none;
+  padding: 0;
+  min-height: 100dvh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body.immersive .header,
+body.immersive .about,
+body.immersive .footer,
+body.immersive .controls-keys {
+  display: none;
+}
+
+body.immersive .stage-wrap {
+  width: 100%;
+  gap: 0.5rem;
+}
+
+body.immersive .stage {
+  width: 100%;
+  max-width: 100vw;
+  border: none;
+  box-shadow: none;
+}
+
+body.immersive .controls-hint {
+  padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom, 0));
+}
+
+body.immersive .controls-toggles {
+  gap: 0.65rem 1rem;
+}
+
 .about {
   max-width: 40rem;
   margin: 2rem auto 0;

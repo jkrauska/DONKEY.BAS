@@ -17,6 +17,7 @@ const stageEl = document.getElementById("stage");
 const soundToggle = document.getElementById("soundToggle");
 const crtToggle = document.getElementById("crtToggle");
 const cheatToggle = document.getElementById("cheatToggle");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
 
 const displayCtx = display.getContext("2d");
 displayCtx.imageSmoothingEnabled = false;
@@ -141,8 +142,9 @@ function drawPlayfieldBase() {
 
 function drawDashes() {
   // FOR Y=4 TO 199 STEP 20: LINE(140,Y)-(140,Y+10)
-  const offset = (dashPhase % 20);
-  for (let y = 4 - offset; y < 199; y += 20) {
+  // Scroll downward (road under a car driving up-screen).
+  const offset = dashPhase % 20;
+  for (let y = 4 + offset - 20; y < 199; y += 20) {
     const y1 = Math.max(0, y);
     const y2 = Math.min(199, y + 10);
     if (y2 > y1) fillRect(ctx, 140, y1, 140, y2, 3, true);
@@ -360,6 +362,10 @@ function moveDonkeyLane(dir) {
 function onKey(e) {
   if (e.key === "Escape") {
     e.preventDefault();
+    if (cssImmersive) {
+      cssImmersive = false;
+      syncFullscreenUi();
+    }
     if (mode !== STATE.TITLE) {
       mode = STATE.TITLE;
       boom = null;
@@ -402,10 +408,25 @@ function onKey(e) {
   }
 }
 
+/** iOS/WebKit often synthesizes a mouse pointer after touch — ignore it. */
+let lastTouchInputAt = 0;
+let lastLaneInputAt = 0;
+const LANE_INPUT_COOLDOWN_MS = 120;
+/** CSS immersive mode (iOS has no element Fullscreen API). */
+let cssImmersive = false;
+
 function onPointer(e) {
-  // One listener on stage only — canvas + stage both listening caused
-  // bubble double-fire (switch + switch back = no visible move).
+  if (!e.isPrimary) return;
+  // Ghost mouse after touch: would switch lanes twice (sound yes, move no).
+  if (e.pointerType === "mouse" && performance.now() - lastTouchInputAt < 600) {
+    return;
+  }
+  if (e.pointerType === "touch" || e.pointerType === "pen") {
+    lastTouchInputAt = performance.now();
+  }
+
   e.preventDefault();
+  e.stopPropagation();
   sound.unlockAudio();
   if (mode === STATE.TITLE) {
     sd = 0;
@@ -414,8 +435,61 @@ function onPointer(e) {
     return;
   }
   if (mode === STATE.PLAY) {
+    const now = performance.now();
+    if (now - lastLaneInputAt < LANE_INPUT_COOLDOWN_MS) return;
+    lastLaneInputAt = now;
     switchLanes();
   }
+}
+
+function nativeFullscreenOn() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function isImmersive() {
+  return cssImmersive || nativeFullscreenOn();
+}
+
+function syncFullscreenUi() {
+  document.body.classList.toggle("immersive", isImmersive());
+  if (fullscreenBtn) {
+    fullscreenBtn.textContent = isImmersive() ? "Exit Full" : "FullScreen";
+  }
+  resize();
+}
+
+async function toggleFullscreen() {
+  sound.unlockAudio();
+  if (isImmersive()) {
+    cssImmersive = false;
+    if (nativeFullscreenOn()) {
+      try {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    syncFullscreenUi();
+    return;
+  }
+
+  // Desktop: native Fullscreen. iOS Safari: CSS immersive (API often missing/no-op).
+  const root = document.documentElement;
+  const req = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (req) {
+    try {
+      await req.call(root);
+      if (nativeFullscreenOn()) {
+        syncFullscreenUi();
+        return;
+      }
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  cssImmersive = true;
+  syncFullscreenUi();
 }
 
 sound.setEnabled(soundToggle.checked);
@@ -428,15 +502,26 @@ crtToggle.addEventListener("change", () => {
   stageEl.classList.toggle("crt", crtToggle.checked);
 });
 
-
 cheatToggle.addEventListener("change", () => {
   cheatDodge();
   if (mode !== STATE.TITLE) redrawPlay();
 });
 
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFullscreen();
+  });
+}
+
+document.addEventListener("fullscreenchange", syncFullscreenUi);
+document.addEventListener("webkitfullscreenchange", syncFullscreenUi);
+
 window.addEventListener("keydown", onKey);
 stageEl.addEventListener("pointerdown", onPointer, { passive: false });
 window.addEventListener("resize", resize);
+window.visualViewport?.addEventListener("resize", resize);
 
 resize();
 const autostart = qs.has("play");
