@@ -78,6 +78,9 @@ body {
     0 12px 40px rgba(0, 0, 0, 0.55);
   line-height: 0;
   max-width: 100%;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .stage.crt::after {
@@ -111,16 +114,25 @@ body {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   background: #000;
+  touch-action: none;
 }
 
 .controls-hint {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem 1.25rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-display);
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.controls-keys,
+.controls-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
 }
 
 kbd {
@@ -180,8 +192,119 @@ kbd {
   margin: 0;
 }
 
-@media (max-width: 420px) {
+/* Source listing */
+.source-nav {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.source-nav a {
+  color: var(--cyan);
+}
+
+.listing-wrap {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.listing {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  background: #0a0c10;
+  border: 1px solid var(--frame);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink);
+  tab-size: 4;
+}
+
+.listing code {
+  font-family: inherit;
+}
+
+.listing .ln {
+  color: #6e7681;
+  user-select: none;
+}
+
+.listing .kw {
+  color: var(--cyan);
+}
+
+.listing .st {
+  color: #ffcc66;
+}
+
+.listing .cm {
+  color: #7a8490;
+  font-style: italic;
+}
+
+.listing .nu {
+  color: var(--magenta);
+}
+
+.listing .id {
+  color: #c9d1d9;
+}
+
+.listing-error {
+  color: #ff7b72;
+}
+
+@media (max-width: 720px) {
   .page {
-    padding: 1rem 0.75rem 2rem;
+    padding: 0.75rem 0 2rem;
+  }
+
+  .header,
+  .controls-hint,
+  .about,
+  .footer,
+  .listing-wrap {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .listing {
+    font-size: 0.72rem;
+  }
+
+  .stage-wrap {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .stage {
+    width: 100%;
+    max-width: 100vw;
+    border-left: none;
+    border-right: none;
+    box-shadow:
+      0 -1px 0 #000,
+      0 1px 0 #000,
+      0 12px 40px rgba(0, 0, 0, 0.55);
+  }
+
+  #game {
+    width: 100%;
+    height: auto;
+  }
+
+  .header {
+    margin-bottom: 0.75rem;
+  }
+
+  .header h1 {
+    font-size: clamp(1.35rem, 7vw, 2rem);
+  }
+
+  .tagline {
+    font-size: 0.85rem;
   }
 }

@@ -58,19 +58,30 @@ export function getPixelIndex(imageData, x, y) {
 }
 
 /**
- * Scale logical 320×200 onto the display with integer nearest-neighbor scale.
- * Uses as much of the viewport as fits (minus page chrome).
+ * Scale logical 320×200 onto the display.
+ * Desktop: integer nearest-neighbor scale.
+ * Mobile: fill viewport width (fractional scale OK; CSS keeps pixels crisp).
  */
 export function fitStage(displayCanvas, stageEl) {
-  const padX = 48;
+  const narrow = window.matchMedia("(max-width: 720px)").matches;
+  // Side borders are 2px each; on mobile we drop them for edge-to-edge.
+  const frameX = narrow ? 0 : 4;
+  const padX = narrow ? 0 : 48;
   // Header, hints, about peek — leave room so the canvas is the hero
-  const padY = Math.min(280, Math.max(160, window.innerHeight * 0.28));
-  const maxW = Math.max(W, window.innerWidth - padX);
+  const padY = narrow
+    ? Math.min(200, Math.max(100, window.innerHeight * 0.22))
+    : Math.min(280, Math.max(160, window.innerHeight * 0.28));
+  const maxW = Math.max(W, window.innerWidth - padX - frameX);
   const maxH = Math.max(H, window.innerHeight - padY);
-  let scale = Math.floor(Math.min(maxW / W, maxH / H));
-  if (scale < 1) scale = 1;
-  const cssW = W * scale;
-  const cssH = H * scale;
+  let scale = Math.min(maxW / W, maxH / H);
+  if (!narrow) {
+    scale = Math.floor(scale);
+    if (scale < 1) scale = 1;
+  } else if (scale < 0.5) {
+    scale = 0.5;
+  }
+  const cssW = Math.round(W * scale);
+  const cssH = Math.round(H * scale);
   displayCanvas.style.width = `${cssW}px`;
   displayCanvas.style.height = `${cssH}px`;
   stageEl.style.width = `${cssW}px`;

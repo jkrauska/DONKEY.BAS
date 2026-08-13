@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Original DONKEY.BAS source — GW-BASIC listing for the 1981 IBM PC game by Bill Gates and Neil Konzen." />
+  <title>DONKEY.BAS — Original Source</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="page source-page">
+    <header class="header">
+      <h1>DONKEY.BAS</h1>
+      <p class="tagline">Original GW-BASIC source (version 1.10) — 131 lines of glory</p>
+      <p class="source-nav">
+        <a href="./">← Play the game</a>
+        · <a href="DONKEY.BAS">Raw file</a>
+        · <a href="https://github.com/jkrauska/DONKEY.BAS/blob/main/DONKEY.BAS">GitHub</a>
+      </p>
+    </header>
+
+    <main class="listing-wrap">
+      <pre id="listing" class="listing" aria-label="DONKEY.BAS source listing"><code>Loading…</code></pre>
+    </main>
+
+    <footer class="footer">
+      <p>(C) Copyright IBM Corp 1981, 1982 — web port for education / preservation.</p>
+    </footer>
+  </div>
+
+  <script type="module">
+    const KEYWORDS = new Set([
+      "AND", "AS", "BEEP", "BF", "BLOAD", "BSAVE", "CALL", "CHAIN", "CHDIR", "CHR$",
+      "CIRCLE", "CLEAR", "CLOSE", "CLS", "COLOR", "COM", "COMMON", "CONT", "COS",
+      "CSNG", "CVD", "CVI", "CVS", "DATA", "DATE$", "DEF", "DEFDBL", "DEFINT",
+      "DEFSNG", "DEFSTR", "DELETE", "DIM", "DRAW", "EDIT", "ELSE", "END", "ENVIRON",
+      "EOF", "EQV", "ERASE", "ERL", "ERR", "ERROR", "EXP", "FIELD", "FILES", "FIX",
+      "FN", "FOR", "FRE", "GET", "GOSUB", "GOTO", "HEX$", "IF", "IMP", "INKEY$",
+      "INP", "INPUT", "INPUT$", "INSTR", "INT", "KEY", "KILL", "LEFT$", "LEN",
+      "LET", "LINE", "LIST", "LLIST", "LOAD", "LOC", "LOCATE", "LOF", "LOG",
+      "LPOS", "LPRINT", "LSET", "MERGE", "MID$", "MKD$", "MKDIR", "MKI$", "MKS$",
+      "MOD", "MOTOR", "NAME", "NEW", "NEXT", "NOT", "OCT$", "OFF", "ON", "OPEN",
+      "OPTION", "OR", "OUT", "PAINT", "PEEK", "PEN", "PLAY", "PMAP", "POINT",
+      "POKE", "POS", "PRESET", "PRINT", "PSET", "PUT", "RANDOMIZE", "READ", "REM",
+      "RENUM", "RESET", "RESTORE", "RESUME", "RETURN", "RIGHT$", "RMDIR", "RND",
+      "RSET", "RUN", "SAVE", "SCREEN", "SEG", "SGN", "SIN", "SOUND", "SPACE$",
+      "SPC", "SQR", "STEP", "STICK", "STOP", "STR$", "STRING$", "SWAP", "SYSTEM",
+      "TAB", "TAN", "THEN", "TIME$", "TIMER", "TO", "TROFF", "TRON", "USING",
+      "USR", "VAL", "VARPTR", "VIEW", "WAIT", "WEND", "WHILE", "WIDTH", "WINDOW",
+      "WRITE", "XOR",
+    ]);
+
+    function escapeHtml(s) {
+      return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function highlightLine(line) {
+      const m = line.match(/^(\d+)(\s*)(.*)$/);
+      if (!m) return escapeHtml(line);
+
+      const [, num, sp, rest] = m;
+      let out = `<span class="ln">${escapeHtml(num)}</span>${escapeHtml(sp)}`;
+
+      const rem = rest.match(/^(REM\b|')(.*)$/i);
+      if (rem) {
+        out += `<span class="cm">${escapeHtml(rest)}</span>`;
+        return out;
+      }
+
+      let i = 0;
+      while (i < rest.length) {
+        if (rest[i] === '"') {
+          let j = i + 1;
+          while (j < rest.length && rest[j] !== '"') j++;
+          if (j < rest.length) j++;
+          out += `<span class="st">${escapeHtml(rest.slice(i, j))}</span>`;
+          i = j;
+          continue;
+        }
+
+        if (rest[i] === "'" || /^REM\b/i.test(rest.slice(i))) {
+          out += `<span class="cm">${escapeHtml(rest.slice(i))}</span>`;
+          break;
+        }
+
+        if (/[&\d.]/.test(rest[i]) && /^(?:&H[0-9A-F]+|&O[0-7]+|\d+(?:\.\d+)?(?:[ED][+-]?\d+)?)/i.test(rest.slice(i))) {
+          const nm = rest.slice(i).match(/^(?:&H[0-9A-F]+|&O[0-7]+|\d+(?:\.\d+)?(?:[ED][+-]?\d+)?)/i)[0];
+          out += `<span class="nu">${escapeHtml(nm)}</span>`;
+          i += nm.length;
+          continue;
+        }
+
+        if (/[A-Za-z]/.test(rest[i])) {
+          const wm = rest.slice(i).match(/^[A-Za-z][A-Za-z0-9.]*[$%!#]?/);
+          const word = wm[0];
+          const key = word.toUpperCase().replace(/[$%!#]$/, "");
+          if (KEYWORDS.has(key) || KEYWORDS.has(word.toUpperCase())) {
+            out += `<span class="kw">${escapeHtml(word)}</span>`;
+          } else {
+            out += `<span class="id">${escapeHtml(word)}</span>`;
+          }
+          i += word.length;
+          continue;
+        }
+
+        out += escapeHtml(rest[i]);
+        i++;
+      }
+
+      return out;
+    }
+
+    function highlight(source) {
+      return source
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .map(highlightLine)
+        .join("\n");
+    }
+
+    const el = document.getElementById("listing");
+    try {
+      const res = await fetch("DONKEY.BAS");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      el.innerHTML = `<code>${highlight(text)}</code>`;
+    } catch (err) {
+      el.innerHTML = `<code class="listing-error">Could not load DONKEY.BAS (${escapeHtml(String(err.message))})</code>`;
+    }
+  </script>
+</body>
+</html>
