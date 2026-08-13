@@ -20,7 +20,7 @@ export function unlockAudio() {
   unlocked = true;
 }
 
-function beep(freq, durationSec, type = "square", gain = 0.072) {
+function beep(freq, durationSec, type = "square", gain = 0.065) {
   if (!enabled || !unlocked || !ctx) return;
   const t0 = ctx.currentTime;
   const osc = ctx.createOscillator();
@@ -42,7 +42,7 @@ export function tick() {
 
 /** Lane switch SOUND 200,1 */
 export function switchLane() {
-  beep(200, 0.06, "square", 0.09);
+  beep(200, 0.06, "square", 0.081);
 }
 
 /** Boom noise bursts */
@@ -65,8 +65,8 @@ export function boomBurst() {
   osc.type = "square";
   osc.frequency.value = freq;
   const og = ctx.createGain();
-  og.gain.value = 0.063;
-  g.gain.value = 0.108;
+  og.gain.value = 0.05;
+  g.gain.value = 0.086;
   src.connect(g);
   g.connect(ctx.destination);
   osc.connect(og);
