@@ -1,0 +1,187 @@
+:root {
+  --bg0: #0c0e12;
+  --bg1: #161b22;
+  --ink: #e6edf3;
+  --muted: #8b949e;
+  --cyan: #55ffff;
+  --magenta: #ff55ff;
+  --frame: #30363d;
+  --font-display: "IBM Plex Mono", "Courier New", Courier, monospace;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("IBM Plex Mono"), local("Courier New");
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, #1a2332 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.page {
+  max-width: min(100%, 120rem);
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 3rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--cyan);
+  text-shadow: 0 0 24px rgba(85, 255, 255, 0.25);
+}
+
+.tagline {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stage-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stage {
+  position: relative;
+  background: #000;
+  border: 2px solid var(--frame);
+  box-shadow:
+    0 0 0 1px #000,
+    0 12px 40px rgba(0, 0, 0, 0.55);
+  line-height: 0;
+  max-width: 100%;
+}
+
+.stage.crt::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.18) 0,
+    rgba(0, 0, 0, 0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.65;
+}
+
+.stage.crt::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+#game {
+  display: block;
+  width: 320px;
+  height: 200px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #000;
+}
+
+.controls-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--frame);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  background: #21262d;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85em;
+}
+
+.crt-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.about {
+  max-width: 40rem;
+  margin: 2rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--frame);
+}
+
+.about h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--magenta);
+  letter-spacing: 0.04em;
+}
+
+.about p {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.about a {
+  color: var(--cyan);
+}
+
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6e7681;
+}
+
+.footer p {
+  margin: 0;
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding: 1rem 0.75rem 2rem;
+  }
+}

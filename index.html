@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Play DONKEY.BAS in your browser — the classic IBM PC game by Bill Gates and Neil Konzen, for the 45th anniversary of the IBM PC." />
+  <title>DONKEY.BAS — IBM PC (1981)</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>DONKEY.BAS</h1>
+      <p class="tagline">A browser port of the 1981 IBM PC classic, for its 45th birthday.</p>
+    </header>
+
+    <main class="stage-wrap">
+      <div id="stage" class="stage">
+        <canvas id="game" width="320" height="200" aria-label="DONKEY.BAS game"></canvas>
+      </div>
+      <div class="controls-hint">
+        <span><kbd>Space</kbd> / tap — switch lanes</span>
+        <span><kbd>Esc</kbd> — title</span>
+        <label class="crt-toggle"><input type="checkbox" id="crtToggle" /> CRT</label>
+        <label class="crt-toggle"><input type="checkbox" id="cheatToggle" /> Cheat (auto-dodge)</label>
+      </div>
+    </main>
+
+    <section class="about">
+      <h2>About</h2>
+      <p>
+        <strong>DONKEY.BAS</strong> shipped with early IBM PC DOS as a demo of color graphics and sound in BASICA.
+        It was written by Microsoft co-founder Bill Gates and Neil Konzen in 1981 (version 1.10 in 1982).
+        You only switch lanes — avoid the donkey, or BOOM.
+      </p>
+      <p>
+        This page recreates the original CGA gameplay in JavaScript.
+        Original source: <a href="DONKEY.BAS">DONKEY.BAS</a>
+        · <a href="https://github.com/jkrauska/DONKEY.BAS">GitHub</a>
+      </p>
+    </section>
+
+    <footer class="footer">
+      <p>(C) Copyright IBM Corp 1981, 1982 — web port for education / preservation.</p>
+    </footer>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
