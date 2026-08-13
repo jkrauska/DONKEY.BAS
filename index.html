@@ -19,10 +19,15 @@
         <canvas id="game" width="320" height="200" aria-label="DONKEY.BAS game"></canvas>
       </div>
       <div class="controls-hint">
-        <span><kbd>Space</kbd> / tap — switch lanes</span>
-        <span><kbd>Esc</kbd> — title</span>
-        <label class="crt-toggle"><input type="checkbox" id="crtToggle" /> CRT</label>
-        <label class="crt-toggle"><input type="checkbox" id="cheatToggle" /> Cheat (auto-dodge)</label>
+        <div class="controls-keys">
+          <span><kbd>Space</kbd> / tap — switch lanes</span>
+          <span><kbd>Esc</kbd> — title</span>
+        </div>
+        <div class="controls-toggles">
+          <label class="crt-toggle"><input type="checkbox" id="soundToggle" checked /> Sound</label>
+          <label class="crt-toggle"><input type="checkbox" id="crtToggle" /> CRT</label>
+          <label class="crt-toggle"><input type="checkbox" id="cheatToggle" /> Cheat (auto-dodge)</label>
+        </div>
       </div>
     </main>
 
@@ -35,7 +40,7 @@
       </p>
       <p>
         This page recreates the original CGA gameplay in JavaScript.
-        Original source: <a href="DONKEY.BAS">DONKEY.BAS</a>
+        Original source: <a href="source.html">DONKEY.BAS</a>
         · <a href="https://github.com/jkrauska/DONKEY.BAS">GitHub</a>
       </p>
     </section>

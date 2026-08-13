@@ -2,6 +2,11 @@
 
 let ctx = null;
 let unlocked = false;
+let enabled = true;
+
+export function setEnabled(on) {
+  enabled = !!on;
+}
 
 export function unlockAudio() {
   if (!ctx) {
@@ -16,7 +21,7 @@ export function unlockAudio() {
 }
 
 function beep(freq, durationSec, type = "square", gain = 0.08) {
-  if (!unlocked || !ctx) return;
+  if (!enabled || !unlocked || !ctx) return;
   const t0 = ctx.currentTime;
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
@@ -42,7 +47,7 @@ export function switchLane() {
 
 /** Boom noise bursts */
 export function boomBurst() {
-  if (!unlocked || !ctx) return;
+  if (!enabled || !unlocked || !ctx) return;
   const t0 = ctx.currentTime;
   const dur = 0.12;
   const bufferSize = (ctx.sampleRate * dur) | 0;

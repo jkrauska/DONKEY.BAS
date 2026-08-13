@@ -14,6 +14,7 @@ import * as sound from "./sound.js";
 
 const display = document.getElementById("game");
 const stageEl = document.getElementById("stage");
+const soundToggle = document.getElementById("soundToggle");
 const crtToggle = document.getElementById("crtToggle");
 const cheatToggle = document.getElementById("cheatToggle");
 
@@ -402,6 +403,8 @@ function onKey(e) {
 }
 
 function onPointer(e) {
+  // One listener on stage only — canvas + stage both listening caused
+  // bubble double-fire (switch + switch back = no visible move).
   e.preventDefault();
   sound.unlockAudio();
   if (mode === STATE.TITLE) {
@@ -415,9 +418,16 @@ function onPointer(e) {
   }
 }
 
+sound.setEnabled(soundToggle.checked);
+soundToggle.addEventListener("change", () => {
+  sound.setEnabled(soundToggle.checked);
+  if (soundToggle.checked) sound.unlockAudio();
+});
+
 crtToggle.addEventListener("change", () => {
   stageEl.classList.toggle("crt", crtToggle.checked);
 });
+
 
 cheatToggle.addEventListener("change", () => {
   cheatDodge();
@@ -425,8 +435,7 @@ cheatToggle.addEventListener("change", () => {
 });
 
 window.addEventListener("keydown", onKey);
-display.addEventListener("pointerdown", onPointer);
-stageEl.addEventListener("pointerdown", onPointer);
+stageEl.addEventListener("pointerdown", onPointer, { passive: false });
 window.addEventListener("resize", resize);
 
 resize();
