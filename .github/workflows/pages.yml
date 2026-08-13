@@ -1,0 +1,50 @@
+# Deploy static site to GitHub Pages and stamp version.json with GITHUB_SHA.
+# Branch deploys have no build env; Actions is how we get a deploy id.
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stamp version.json
+        run: |
+          SHORT="$(echo "${GITHUB_SHA}" | cut -c1-7)"
+          printf '%s\n' "{" \
+            "  \"sha\": \"${GITHUB_SHA}\"," \
+            "  \"short\": \"${SHORT}\"," \
+            "  \"ref\": \"${GITHUB_REF_NAME}\"," \
+            "  \"builtAt\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
+            "}" > version.json
+          cat version.json
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

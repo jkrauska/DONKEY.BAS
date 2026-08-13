@@ -254,6 +254,23 @@ body.immersive .controls-toggles {
   margin: 0;
 }
 
+.footer .build-id {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #484f58;
+}
+
+.footer .build-id a {
+  color: #6e7681;
+  text-decoration: none;
+}
+
+.footer .build-id a:hover {
+  color: var(--cyan);
+}
+
 /* Source listing */
 .source-nav {
   margin: 0.75rem 0 0;

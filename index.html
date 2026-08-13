@@ -48,9 +48,31 @@
 
     <footer class="footer">
       <p>(C) Copyright IBM Corp 1981, 1982 — web port for education / preservation.</p>
+      <p class="build-id" id="buildId" hidden></p>
     </footer>
   </div>
 
   <script type="module" src="js/game.js"></script>
+  <script type="module">
+    // Stamped at deploy by .github/workflows/pages.yml (GITHUB_SHA). Absent locally.
+    try {
+      const res = await fetch("version.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("no version");
+      const v = await res.json();
+      const el = document.getElementById("buildId");
+      if (!el || !v?.short || !v?.sha) throw new Error("bad version");
+      const a = document.createElement("a");
+      a.href = `https://github.com/jkrauska/DONKEY.BAS/commit/${v.sha}`;
+      a.textContent = v.short;
+      a.rel = "noopener";
+      el.replaceChildren(document.createTextNode("build "), a);
+      if (v.builtAt) {
+        el.append(document.createTextNode(` · ${v.builtAt.slice(0, 10)}`));
+      }
+      el.hidden = false;
+    } catch {
+      /* local / pre-Actions deploy */
+    }
+  </script>
 </body>
 </html>

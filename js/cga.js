@@ -57,6 +57,9 @@ export function getPixelIndex(imageData, x, y) {
   return best;
 }
 
+/** Last desktop integer scale — used to damp scrollbar / subpixel feedback loops. */
+let lastDesktopScale = 0;
+
 /**
  * Scale logical 320×200 onto the display.
  * Desktop: integer nearest-neighbor scale.
@@ -72,6 +75,7 @@ export function fitStage(displayCanvas, stageEl, opts = {}) {
   let cssW;
   let cssH;
   if (narrow) {
+    lastDesktopScale = 0;
     // Always full bleed width on phones / fullscreen — never letterbox sideways.
     cssW = Math.round(vw);
     cssH = Math.round((cssW * H) / W);
@@ -82,8 +86,25 @@ export function fitStage(displayCanvas, stageEl, opts = {}) {
   } else {
     const padX = 48 + 4; // page margin + stage border
     const padY = Math.min(280, Math.max(160, vh * 0.28));
-    let scale = Math.floor(Math.min((vw - padX) / W, (vh - padY) / H));
+    // Prefer laid-out content width (page max-width) over raw viewport so we
+    // don't pick a scale that overflows and toggles scrollbars.
+    const parentW = stageEl.parentElement?.clientWidth || 0;
+    const maxW = parentW > 0 ? parentW : Math.max(0, vw - padX);
+    let scale = Math.floor(Math.min(maxW / W, (vh - padY) / H));
     if (scale < 1) scale = 1;
+
+    // Hysteresis: keep the previous scale unless the viewport clearly no longer
+    // fits it (avoids flicker at integer scale boundaries, e.g. huge Firefox windows).
+    const slack = 32;
+    if (lastDesktopScale > scale) {
+      const needW = W * lastDesktopScale;
+      const needH = H * lastDesktopScale + padY;
+      if (maxW + slack >= needW && vh + slack >= needH) {
+        scale = lastDesktopScale;
+      }
+    }
+    lastDesktopScale = scale;
+
     cssW = W * scale;
     cssH = H * scale;
   }
